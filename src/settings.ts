@@ -136,7 +136,8 @@ export class ClippingsSettingsTab extends PluginSettingTab {
           } else if (this.plugin.settings.secrets.instapaper.accessToken) {
             const loggedIn = await new InstapaperAPI(
               this.plugin.settings.secrets.instapaper
-            ).verifyLogin();
+            ).listBookmarks();
+
             if (loggedIn) {
               toggle.setTooltip('Login success!');
             } else {
@@ -171,8 +172,8 @@ export class ClippingsSettingsTab extends PluginSettingTab {
                       credentials.password
                     );
                     this.plugin.settings.secrets.instapaper.accessToken = token;
-                    await this.plugin.saveSettings();
                     await instapaper.verifyLogin();
+                    await this.plugin.saveSettings();
                   } catch (err) {
                     toggle.setValue(false);
                     throw err;
