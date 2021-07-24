@@ -14,7 +14,9 @@
       "es5",
       "scripthost",
       "es2015"
-    ]
+    ],
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "**/*.ts"
