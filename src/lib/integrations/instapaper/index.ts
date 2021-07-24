@@ -4,8 +4,9 @@ import qs from 'query-string';
 const crypto = require('crypto');
 
 import { AuthInstapaper } from 'src/settings';
+import request from 'src/lib/util/request';
 
-const instapaper = 'https://instapaper.com';
+const instapaper = 'https://www.instapaper.com';
 
 export default class InstapaperAPI {
   private auth: AuthInstapaper;
@@ -35,48 +36,48 @@ export default class InstapaperAPI {
     const req = {
       url: `${instapaper}/api/1/oauth/access_token`,
       method: 'POST',
+      data: {
+        x_auth_username: email,
+        x_auth_password: password,
+        x_auth_mode: 'client_auth',
+      },
     };
-    return new Promise((resolve, reject) => {
-      ajax({
-        url: req.url,
-        method: 'POST',
-        headers: this.client.toHeader(this.client.authorize(req)) as any,
-        data: {
-          x_auth_username: email,
-          x_auth_password: password,
-          x_auth_mode: 'client_auth',
-        },
-        withCredentials: true,
-        success: (resp) => {
-          const qline = qs.parse(resp);
-          const accessToken = {
-            key: qline['oauth_token'] as string,
-            secret: qline['oauth_token_secret'] as string,
-          };
-          this.auth.accessToken = accessToken;
-          resolve(accessToken);
-        },
-        error: (err) => reject(err),
-      });
+
+    const form = this.client.authorize({
+      url: `${instapaper}/api/1/oauth/access_token`,
+      method: 'POST',
+      data: req.data,
+      includeBodyHash: true,
     });
+    const header = this.client.toHeader(form);
+    const resp = await request({
+      url: req.url,
+      method: 'POST',
+      headers: { Authorization: header.Authorization },
+      body: JSON.stringify(req.data),
+    });
+
+    const qline = qs.parse(resp.data);
+    const accessToken = {
+      key: qline['oauth_token'] as string,
+      secret: qline['oauth_token_secret'] as string,
+    };
+    this.auth.accessToken = accessToken;
+    return accessToken;
   }
 
   async verifyLogin() {
-    const request = {
+    const req = {
       url: `${instapaper}/api/1/oauth/access_token`,
       method: 'POST',
     };
-    return new Promise((resolve, reject) => {
-      ajax({
-        url: request.url,
-        method: 'POST',
-        headers: this.client.toHeader(
-          this.client.authorize(request, this.auth.accessToken)
-        ) as any,
-        withCredentials: true,
-        success: (resp) => resolve(resp),
-        error: (err) => reject(err),
-      });
+    const resp = await request({
+      url: req.url,
+      method: 'POST',
+      headers: this.client.toHeader(
+        this.client.authorize(req, this.auth.accessToken)
+      ) as any,
     });
+    console.log(resp.data);
   }
 }

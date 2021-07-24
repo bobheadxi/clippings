@@ -1,8 +1,6 @@
 import { App, Modal, Notice, Plugin } from 'obsidian';
 const path = require('path');
 
-import manifest from '../manifest.json';
-
 import {
   ClippingsSettingsTab,
   ClippingsSettings,
@@ -63,26 +61,23 @@ export default class Clippings extends Plugin {
         await this.app.vault.adapter.read(this.getSecretsPath())
       );
     } catch (err) {
-      console.log('initializing secrets')
+      console.log('initializing secrets');
       await this.app.vault.adapter.write(
         this.getSecretsPath(),
         JSON.stringify(secrets)
       );
     }
-    this.settings = Object.assign(
-      {},
-      DEFAULT_SETTINGS,
-      await this.loadData(),
-      { secrets },
-    );
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData(), {
+      secrets,
+    });
   }
 
   async saveSettings() {
-	// split and save normal settings separately
+    // split and save normal settings separately
     const cleanSettings = Object.assign({}, this.settings);
     cleanSettings.secrets = null;
     await this.saveData(cleanSettings);
-	// save secrets
+    // save secrets
     this.app.vault.adapter.write(
       this.getSecretsPath(),
       JSON.stringify(this.settings.secrets)

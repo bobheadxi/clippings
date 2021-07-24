@@ -41,38 +41,41 @@ export class ClippingsSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName('Folder for new references')
         .addText((text) => {
-          text.setDisabled(true) // TODO
-        })
+          text.setDisabled(true); // TODO
+        });
       new Setting(containerEl)
         .setName('Folder for existing references')
         .addText((text) => {
-          text.setDisabled(true) // TODO
-        })
+          text.setDisabled(true); // TODO
+        });
       new Setting(containerEl)
         .setName('Import as quotes')
         .addToggle((toggle) => {
-          toggle.setDisabled(true) // TODO
-          toggle.setTooltip('WIP')
-        })
+          toggle.setDisabled(true); // TODO
+          toggle.setTooltip('WIP');
+        });
     }
 
     // Integrations options
     containerEl.createEl('h2', { text: 'Integrations' });
+    containerEl.createEl('p', {
+      text: 'Secrets (for authentication) are stored in `.obsidian/clippings-secrets.json` - make sure to add this file to your `.gitignore` if you are using Git with your vault!',
+    });
     // Markdown integration
     {
       containerEl.createEl('h3', { text: 'Markdown' });
       new Setting(containerEl)
         .setName('Import lists as quotes')
         .addToggle((toggle) => {
-          toggle.setDisabled(true) // TODO
-          toggle.setTooltip('WIP')
-        })
+          toggle.setDisabled(true); // TODO
+          toggle.setTooltip('WIP');
+        });
       new Setting(containerEl)
         .setName('Import comments')
         .addToggle((toggle) => {
-          toggle.setDisabled(true) // TODO
-          toggle.setTooltip('WIP')
-        })
+          toggle.setDisabled(true); // TODO
+          toggle.setTooltip('WIP');
+        });
     }
     // Instapaper integration
     {
@@ -120,8 +123,12 @@ export class ClippingsSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName('Log in with OAuth application')
         .addToggle((toggle) => {
-          toggle.setValue(!!this.plugin.settings.secrets.instapaper.accessToken);
-          toggle.setTooltip('OAuth application credentials must be set before logging in!')
+          toggle.setValue(
+            !!this.plugin.settings.secrets.instapaper.accessToken
+          );
+          toggle.setTooltip(
+            'OAuth application credentials must be set before logging in!'
+          );
           toggle.disabled =
             !this.plugin.settings.secrets.instapaper.consumerSecret ||
             !this.plugin.settings.secrets.instapaper.consumerID;
@@ -134,15 +141,20 @@ export class ClippingsSettingsTab extends PluginSettingTab {
               // log in
               new LoginModal(
                 this.app,
-                'Log in to Instapaper',
-                'Log in with your Instapaper account',
+                'Integrate with Instapaper',
+                'Log in with your Instapaper account.',
                 async (credentials) => {
                   try {
-                    const token = await new InstapaperAPI(
+                    const instapaper = new InstapaperAPI(
                       this.plugin.settings.secrets.instapaper
-                    ).logIn(credentials.username, credentials.password);
+                    );
+                    const token = await instapaper.logIn(
+                      credentials.username,
+                      credentials.password
+                    );
                     this.plugin.settings.secrets.instapaper.accessToken = token;
                     await this.plugin.saveSettings();
+                    await instapaper.verifyLogin();
                   } catch (err) {
                     toggle.setValue(false);
                     throw err;
@@ -174,7 +186,7 @@ class LoginModal extends Modal {
     title: string,
     description: string,
     callback: (credentials: Credentials) => Promise<void>,
-    onClose?: (success: boolean) => void,
+    onClose?: (success: boolean) => void
   ) {
     super(app);
     this.title = title;
@@ -187,8 +199,8 @@ class LoginModal extends Modal {
   onOpen() {
     let { contentEl } = this;
 
-    contentEl.createEl('h1', this.title);
-    contentEl.createEl('p', this.description);
+    contentEl.createEl('h1', { text: this.title });
+    contentEl.createEl('p', { text: this.description });
 
     new Setting(contentEl)
       .setName('Email')
@@ -208,7 +220,12 @@ class LoginModal extends Modal {
           this.success = true;
           new Notice('Log in successful!', 8000);
         } catch (err) {
-          new Notice('Failed to log in to Todoist: ' + JSON.stringify(err), 8000);
+          console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+          new Notice(
+            'Failed to log in to Instapaper: ' +
+              JSON.stringify(err, Object.getOwnPropertyNames(err)),
+            8000
+          );
         }
         this.close();
       });
