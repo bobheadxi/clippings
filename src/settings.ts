@@ -122,16 +122,32 @@ export class ClippingsSettingsTab extends PluginSettingTab {
         );
       new Setting(containerEl)
         .setName('Log in with OAuth application')
-        .addToggle((toggle) => {
+        .addToggle(async (toggle) => {
           toggle.setValue(
             !!this.plugin.settings.secrets.instapaper.accessToken
-          );
-          toggle.setTooltip(
-            'OAuth application credentials must be set before logging in!'
           );
           toggle.disabled =
             !this.plugin.settings.secrets.instapaper.consumerSecret ||
             !this.plugin.settings.secrets.instapaper.consumerID;
+          if (toggle.disabled) {
+            toggle.setTooltip(
+              'OAuth application credentials must be set before logging in!'
+            );
+          } else if (this.plugin.settings.secrets.instapaper.accessToken) {
+            const loggedIn = await new InstapaperAPI(
+              this.plugin.settings.secrets.instapaper
+            ).verifyLogin();
+            if (!loggedIn) {
+              toggle.setTooltip(
+                'Authentication is set up, but login verification failed - please try logging in again!'
+              );
+              new Notice(
+                'Clippy and Instapaper integration failed to connect - please try logging in again!',
+                8000
+              );
+            }
+          }
+
           toggle.onChange(async (value) => {
             if (!value) {
               // Log out of account

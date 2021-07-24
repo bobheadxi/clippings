@@ -1,4 +1,5 @@
 import { App, Modal, Notice, Plugin } from 'obsidian';
+import InstapaperAPI from './lib/integrations/instapaper';
 const path = require('path');
 
 import {
@@ -15,28 +16,23 @@ export default class Clippings extends Plugin {
 
     await this.loadSettings();
 
-    this.addRibbonIcon('', 'Sample Plugin', () => {
-      new Notice('This is a notice!');
-    });
-
-    this.addStatusBarItem().setText('Status Bar Text');
-
     this.addCommand({
       id: 'open-sample-modal',
       name: 'Open Sample Modal',
-      // callback: () => {
-      // 	console.log('Simple Callback');
-      // },
-      checkCallback: (checking: boolean) => {
-        let leaf = this.app.workspace.activeLeaf;
-        if (leaf) {
-          if (!checking) {
-            new SampleModal(this.app).open();
-          }
-          return true;
-        }
-        return false;
+      callback: async () => {
+        console.log('Simple Callback');
+        await new InstapaperAPI(this.settings.secrets.instapaper).verifyLogin();
       },
+      // checkCallback: (checking: boolean) => {
+      //   let leaf = this.app.workspace.activeLeaf;
+      //   if (leaf) {
+      //     if (!checking) {
+      //       new SampleModal(this.app).open();
+      //     }
+      //     return true;
+      //   }
+      //   return false;
+      // },
     });
 
     this.addSettingTab(new ClippingsSettingsTab(this.app, this));
@@ -86,13 +82,15 @@ export default class Clippings extends Plugin {
 }
 
 class SampleModal extends Modal {
-  constructor(app: App) {
+  highlights: string;
+  constructor(app: App, highlights: string) {
     super(app);
+    this.highlights = highlights;
   }
 
   onOpen() {
     let { contentEl } = this;
-    contentEl.setText('Woah!');
+    contentEl.setText(this.highlights);
   }
 
   onClose() {

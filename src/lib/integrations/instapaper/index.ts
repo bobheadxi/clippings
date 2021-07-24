@@ -71,13 +71,19 @@ export default class InstapaperAPI {
       url: `${instapaper}/api/1/oauth/access_token`,
       method: 'POST',
     };
-    const resp = await request({
-      url: req.url,
-      method: 'POST',
-      headers: this.client.toHeader(
-        this.client.authorize(req, this.auth.accessToken)
-      ) as any,
-    });
-    console.log(resp.data);
+    try {
+      const resp = await request({
+        url: req.url,
+        method: 'POST',
+        headers: this.client.toHeader(
+          this.client.authorize(req, this.auth.accessToken)
+        ) as any,
+      });
+      console.log(resp.data);
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   }
 }
