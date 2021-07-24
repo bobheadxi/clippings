@@ -1,16 +1,13 @@
-import { RequestParam } from 'obsidian';
-import fetch from 'node-fetch';
+import { RequestParam, request } from 'obsidian';
 
 export type RequestOptions = {
-  headers?: Record<string, string>;
+  // Obsidian does not yet support headers.
+  // headers?: Record<string, string>;
 } & RequestParam;
 
-export default async function request(req: RequestOptions): Promise<string> {
+export default async function makeRequest(
+  req: RequestOptions
+): Promise<string> {
   console.log(req);
-  const res = await fetch(req.url, { ...req });
-  const data = await res.text();
-  if (!res.ok) {
-    throw new Error(`${res.statusText}: ${data} (${res.status})`);
-  }
-  return data;
+  return await request(req);
 }

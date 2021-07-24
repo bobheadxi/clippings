@@ -35,10 +35,11 @@ export default class InstapaperAPI {
       data,
     };
     const formAuth = this.client.authorize(req, this.auth.accessToken);
-    return request({
+    return await request({
       url: req.url,
       method: req.method,
-      headers: { ...this.client.toHeader(formAuth) },
+      // TODO: renable if Obsidian supports headers
+      // headers: { ...this.client.toHeader(formAuth) },
       body: qs.stringify(formAuth),
     });
   }
@@ -52,12 +53,16 @@ export default class InstapaperAPI {
       x_auth_password: password,
       x_auth_mode: 'client_auth',
     });
+    console.log(resp);
 
     const qline = qs.parse(resp);
     const accessToken = {
       key: qline['oauth_token'] as string,
       secret: qline['oauth_token_secret'] as string,
     };
+    if (!accessToken.key || !accessToken.secret) {
+      throw new Error('Login failed: ' + resp);
+    }
     this.auth.accessToken = accessToken;
     return accessToken;
   }
@@ -65,10 +70,10 @@ export default class InstapaperAPI {
   async verifyLogin() {
     try {
       const resp = await this.request('account/verify_credentials');
-      console.log(resp);
+      console.log('Verify login response', resp);
       return true;
     } catch (err) {
-      console.error(err);
+      console.warn('Failed to verify login', err);
       return false;
     }
   }
@@ -76,10 +81,10 @@ export default class InstapaperAPI {
   async listBookmarks() {
     try {
       const resp = await this.request('bookmarks/list', { limit: 1 });
-      console.log(resp);
+      console.log('Bookmarks', resp);
       return true;
     } catch (err) {
-      console.error(err);
+      console.error('Failed to list');
       return false;
     }
   }

@@ -25,7 +25,7 @@ export default {
   external: ['obsidian'],
   plugins: [
     typescript(),
-    nodeResolve({browser: false}), // to get node-fetch CORS bypass
+    nodeResolve({browser: true}),
     commonjs(),
     json(),
   ]

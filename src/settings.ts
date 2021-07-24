@@ -156,6 +156,7 @@ export class ClippingsSettingsTab extends PluginSettingTab {
               // Log out of account
               this.plugin.settings.secrets.instapaper.accessToken = null;
               await this.plugin.saveSettings();
+              toggle.setTooltip('Account logged out.');
             } else {
               // log in
               new LoginModal(
@@ -164,15 +165,10 @@ export class ClippingsSettingsTab extends PluginSettingTab {
                 'Log in with your Instapaper account.',
                 async (credentials) => {
                   try {
-                    const instapaper = new InstapaperAPI(
+                    const token = await new InstapaperAPI(
                       this.plugin.settings.secrets.instapaper
-                    );
-                    const token = await instapaper.logIn(
-                      credentials.username,
-                      credentials.password
-                    );
+                    ).logIn(credentials.username, credentials.password);
                     this.plugin.settings.secrets.instapaper.accessToken = token;
-                    await instapaper.verifyLogin();
                     await this.plugin.saveSettings();
                   } catch (err) {
                     toggle.setValue(false);
@@ -196,7 +192,7 @@ class LoginModal extends Modal {
   title: string;
   description: string;
   private credentials: Credentials;
-  private callback: (credentials: Credentials) => Promise<void>;
+  private loginCallback: (credentials: Credentials) => Promise<void>;
   private onCloseCallback: (success: boolean) => void;
   success: boolean;
 
@@ -204,13 +200,13 @@ class LoginModal extends Modal {
     app: App,
     title: string,
     description: string,
-    callback: (credentials: Credentials) => Promise<void>,
+    loginCallback: (credentials: Credentials) => Promise<void>,
     onClose?: (success: boolean) => void
   ) {
     super(app);
     this.title = title;
     this.description = description;
-    this.callback = callback;
+    this.loginCallback = loginCallback;
     this.credentials = {};
     this.onCloseCallback = onClose;
   }
@@ -235,18 +231,18 @@ class LoginModal extends Modal {
       button.setButtonText('Log in');
       button.onClick(async () => {
         try {
-          await this.callback(this.credentials);
+          await this.loginCallback(this.credentials);
           this.success = true;
           new Notice('Log in successful!', 8000);
+          this.close();
         } catch (err) {
-          console.error(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+          console.error('Login failed', err);
           new Notice(
             'Failed to log in to Instapaper: ' +
               JSON.stringify(err, Object.getOwnPropertyNames(err)),
             8000
           );
         }
-        this.close();
       });
     });
   }
