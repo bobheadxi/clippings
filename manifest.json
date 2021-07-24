@@ -1,7 +1,7 @@
 {
-	"id": "obsidian-clippings",
+	"id": "clippings",
 	"name": "Clippings",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"minAppVersion": "0.12.11",
 	"description": "An opinionated, minimal highlights and reference manager for Obsidian.",
 	"author": "@bobheadxi",

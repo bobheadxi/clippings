@@ -1,8 +1,8 @@
 {
-  "name": "obsidian-clippings",
+  "name": "clippings",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "rollup --config rollup.config.js -w",
+    "dev": "rollup --config rollup.config.dev.js -w",
     "build": "rollup --config rollup.config.js --environment BUILD:production"
   },
   "devDependencies": {
