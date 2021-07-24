@@ -5,9 +5,7 @@ export type RequestOptions = {
   headers?: Record<string, string>;
 } & RequestParam;
 
-export default async function request(req: RequestOptions): Promise<{
-  data: string;
-}> {
+export default async function request(req: RequestOptions): Promise<string> {
   const res = await fetch(req.url, {
     headers: { ...req.headers, 'Content-Type': 'application/json' },
     method: req.method,
@@ -17,7 +15,5 @@ export default async function request(req: RequestOptions): Promise<{
   if (!res.ok) {
     throw new Error(`${res.statusText}: ${data}`);
   }
-  return {
-    data,
-  };
+  return data;
 }

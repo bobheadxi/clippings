@@ -137,7 +137,9 @@ export class ClippingsSettingsTab extends PluginSettingTab {
             const loggedIn = await new InstapaperAPI(
               this.plugin.settings.secrets.instapaper
             ).verifyLogin();
-            if (!loggedIn) {
+            if (loggedIn) {
+              toggle.setTooltip('Login success!');
+            } else {
               toggle.setTooltip(
                 'Authentication is set up, but login verification failed - please try logging in again!'
               );
