@@ -1,41 +1,27 @@
-import { App, Modal, Notice, Plugin } from 'obsidian';
-import InstapaperAPI from './lib/integrations/instapaper';
+import { Plugin } from 'obsidian';
+import Integration, { integrationsRegistry } from './lib/integrations';
+
 const path = require('path');
 
-import {
-  ClippingsSettingsTab,
-  ClippingsSettings,
-  DEFAULT_SETTINGS,
-} from './settings';
+import { ClippingsSettingsTab, AllSettings } from './settings';
 
 export default class Clippings extends Plugin {
-  settings: ClippingsSettings;
+  integrations: Integration<any, any>[];
 
   async onload() {
     console.log('loading plugin');
 
-    await this.loadSettings();
+    const settings = await this.loadSettings();
+    for (let EnabledIntegration of integrationsRegistry) {
+      const int = new EnabledIntegration(this.app, settings.pluginSettings, {
+        settings: settings.integrations[EnabledIntegration.id],
+        secrets: settings.secrets[EnabledIntegration.id],
+      });
+      int.contributeToPlugin(this);
+      this.integrations.push(int);
+    }
 
-    this.addCommand({
-      id: 'open-sample-modal',
-      name: 'Open Sample Modal',
-      callback: async () => {
-        console.log('Simple Callback');
-        await new InstapaperAPI(this.settings.secrets.instapaper).verifyLogin();
-      },
-      // checkCallback: (checking: boolean) => {
-      //   let leaf = this.app.workspace.activeLeaf;
-      //   if (leaf) {
-      //     if (!checking) {
-      //       new SampleModal(this.app).open();
-      //     }
-      //     return true;
-      //   }
-      //   return false;
-      // },
-    });
-
-    this.addSettingTab(new ClippingsSettingsTab(this.app, this));
+    this.addSettingTab(new ClippingsSettingsTab(this));
 
     this.registerInterval(
       window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000)
@@ -47,11 +33,14 @@ export default class Clippings extends Plugin {
   }
 
   getSecretsPath() {
-    return path.join(this.app.vault.configDir, 'clippings-secrets.json');
+    return path.join(
+      this.app.vault.configDir,
+      `${this.manifest.id}-secrets.json`
+    );
   }
 
-  async loadSettings() {
-    let secrets = DEFAULT_SETTINGS.secrets;
+  async loadSettings(): Promise<AllSettings> {
+    let secrets = {};
     try {
       secrets = JSON.parse(
         await this.app.vault.adapter.read(this.getSecretsPath())
@@ -63,38 +52,27 @@ export default class Clippings extends Plugin {
         JSON.stringify(secrets)
       );
     }
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData(), {
-      secrets,
-    });
+    return Object.assign(
+      {
+        settings: {},
+        integrations: {},
+      },
+      await this.loadData(),
+      {
+        secrets,
+      }
+    ) as AllSettings;
   }
 
-  async saveSettings() {
+  async saveSettings(settings: AllSettings) {
     // split and save normal settings separately
-    const cleanSettings = Object.assign({}, this.settings);
+    const cleanSettings = Object.assign({}, settings);
     cleanSettings.secrets = null;
     await this.saveData(cleanSettings);
     // save secrets
     this.app.vault.adapter.write(
       this.getSecretsPath(),
-      JSON.stringify(this.settings.secrets)
+      JSON.stringify(settings.secrets)
     );
-  }
-}
-
-class SampleModal extends Modal {
-  highlights: string;
-  constructor(app: App, highlights: string) {
-    super(app);
-    this.highlights = highlights;
-  }
-
-  onOpen() {
-    let { contentEl } = this;
-    contentEl.setText(this.highlights);
-  }
-
-  onClose() {
-    let { contentEl } = this;
-    contentEl.empty();
   }
 }
