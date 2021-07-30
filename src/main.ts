@@ -1,4 +1,5 @@
 import { Plugin } from 'obsidian';
+import deepmerge from 'deepmerge';
 import Integration, { integrationsRegistry } from './lib/integrations';
 
 const path = require('path');
@@ -52,23 +53,21 @@ export default class Clippings extends Plugin {
         JSON.stringify(secrets)
       );
     }
-    return Object.assign(
-      {
-        settings: {},
-        integrations: {},
-      },
-      await this.loadData(),
-      {
-        secrets,
-      }
-    ) as AllSettings;
+    return Object.assign({}, await this.loadData(), {
+      secrets,
+      integrations: {},
+    }) as AllSettings;
   }
 
   async saveSettings(settings: AllSettings) {
-    // split and save normal settings separately
-    const cleanSettings = Object.assign({}, settings);
+    const oldSettings = await this.loadSettings();
+    const newSettings = deepmerge(oldSettings, settings);
+
+    // only save non-secrets as normal data
+    const cleanSettings = Object.assign({}, newSettings);
     cleanSettings.secrets = null;
     await this.saveData(cleanSettings);
+
     // save secrets
     this.app.vault.adapter.write(
       this.getSecretsPath(),

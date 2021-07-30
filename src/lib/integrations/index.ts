@@ -43,6 +43,10 @@ export default abstract class Integration<
     saveSettings: () => Promise<void>
   ): void;
 
+  getID() {
+    return Integration.id;
+  }
+
   getSettings() {
     return {
       settings: this.settings,

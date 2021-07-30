@@ -1,5 +1,4 @@
-import { App, PluginSettingTab, Setting, Modal, Notice } from 'obsidian';
-import Instapaper from './lib/integrations/instapaper';
+import { PluginSettingTab, Setting } from 'obsidian';
 
 import Clippings from './main';
 
@@ -8,9 +7,9 @@ export interface PluginSettings {}
 export const DEFAULT_SETTINGS: PluginSettings = {};
 
 export interface AllSettings {
-  integrations: Record<string, any>;
-  secrets: Record<string, any>;
-  pluginSettings: PluginSettings;
+  integrations?: Record<string, any>;
+  secrets?: Record<string, any>;
+  pluginSettings?: PluginSettings;
 }
 
 export class ClippingsSettingsTab extends PluginSettingTab {
@@ -65,9 +64,11 @@ export class ClippingsSettingsTab extends PluginSettingTab {
     );
     for (let integration of this.plugin.integrations) {
       integration.contributeSettings(containerEl, async () => {
-        // TODO ergonimc settings savings
         const config = integration.getSettings();
-        await this.plugin.saveSettings({});
+        await this.plugin.saveSettings({
+          integrations: { [integration.getID()]: config.settings },
+          secrets: { [integration.getID()]: config.secrets },
+        });
       });
     }
   }
