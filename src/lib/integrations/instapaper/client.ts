@@ -9,10 +9,9 @@ const instapaper = 'https://www.instapaper.com';
 
 export default class InstapaperClient {
   private client: OAuth;
-  private settings: Settings;
   private accessToken?: OAuth.Token;
 
-  constructor(secrets: Secrets, setting: Settings) {
+  constructor(secrets: Secrets) {
     this.accessToken = secrets.accessToken;
     this.client = new OAuth({
       consumer: {

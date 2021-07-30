@@ -1,14 +1,8 @@
-import OAuth from 'oauth-1.0a';
-import qs from 'query-string';
-import crypto from 'crypto';
 import { App, Setting, Notice, Plugin } from 'obsidian';
 
-import request from 'src/lib/util/request';
-import Integration from 'src/lib/integrations';
+import Integration from 'src/lib/integrations/integration';
 import { PluginSettings } from 'src/settings';
 import InstapaperClient from './client';
-
-const instapaper = 'https://www.instapaper.com';
 
 export interface Secrets {
   consumerID?: string;
@@ -20,6 +14,9 @@ export interface Settings {}
 
 export default class Instapaper extends Integration<Settings, Secrets> {
   static id = 'instapaper';
+  getID() {
+    return Instapaper.id;
+  }
 
   constructor(
     app: App,
@@ -36,7 +33,7 @@ export default class Instapaper extends Integration<Settings, Secrets> {
     // TODO
   }
 
-  contributeSettings(settings: HTMLElement) {
+  contributeSettings(settings: HTMLElement, save: () => Promise<void>) {
     settings.createEl('h3', { text: 'Instapaper' });
     new Setting(settings)
       .setName('OAuth application')
@@ -58,6 +55,7 @@ export default class Instapaper extends Integration<Settings, Secrets> {
           .setValue('*'.repeat(this.secrets.consumerID?.length))
           .onChange(async (value) => {
             this.secrets.consumerID = value;
+            await save();
           })
       )
       .addText((text) =>
@@ -66,6 +64,7 @@ export default class Instapaper extends Integration<Settings, Secrets> {
           .setValue('*'.repeat(this.secrets.consumerSecret?.length))
           .onChange(async (value) => {
             this.secrets.consumerSecret = value;
+            await save();
           })
       );
     new Setting(settings)
@@ -80,8 +79,7 @@ export default class Instapaper extends Integration<Settings, Secrets> {
           );
         } else if (this.secrets.accessToken) {
           const loggedIn = await new InstapaperClient(
-            this.secrets,
-            this.settings
+            this.secrets
           ).listBookmarks();
 
           if (loggedIn) {
@@ -109,10 +107,10 @@ export default class Instapaper extends Integration<Settings, Secrets> {
               'Log in with your Instapaper account.',
               async (credentials) => {
                 try {
-                  const token = await new InstapaperClient(
-                    this.secrets,
-                    this.settings
-                  ).logIn(credentials.username, credentials.password);
+                  const token = await new InstapaperClient(this.secrets).logIn(
+                    credentials.username,
+                    credentials.password
+                  );
                   this.secrets.accessToken = token;
                 } catch (err) {
                   toggle.setValue(false);
@@ -124,6 +122,7 @@ export default class Instapaper extends Integration<Settings, Secrets> {
               }
             ).open();
           }
+          await save();
         });
       });
   }

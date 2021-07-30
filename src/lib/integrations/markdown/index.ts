@@ -1,9 +1,12 @@
 import { Setting } from 'obsidian';
 
-import Integration from '..';
+import Integration from 'src/lib/integrations/integration';
 
 export default class Markdown extends Integration<{}, {}> {
   static id = 'markdown';
+  getID() {
+    return Markdown.id;
+  }
 
   contributeToPlugin() {}
 
