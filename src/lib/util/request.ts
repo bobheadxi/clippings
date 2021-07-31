@@ -8,6 +8,5 @@ export type RequestOptions = {
 export default async function makeRequest(
   req: RequestOptions
 ): Promise<string> {
-  console.log(req);
   return await request(req);
 }

@@ -1,26 +1,89 @@
-import { Setting } from 'obsidian';
+import { Setting, Plugin, Notice } from 'obsidian';
 
 import Integration from 'src/lib/integrations/integration';
+import { PluginSettings } from 'src/settings';
 
-export default class Markdown extends Integration<{}, {}> {
+import generateReferenceNotes from './import';
+
+type Settings = {
+  replaceImportedNoteContents?: boolean;
+};
+
+export default class Markdown extends Integration<Settings, {}> {
   static id = 'markdown';
   getID() {
     return Markdown.id;
   }
 
-  contributeToPlugin() {}
+  constructor(
+    plugin: Plugin,
+    pluginSettings: PluginSettings,
+    integrationConfig: {
+      settings: Settings;
+      secrets: {};
+    }
+  ) {
+    super(plugin, pluginSettings, integrationConfig);
+    plugin.addCommand({
+      id: 'markdown.import',
+      name: 'Import note as highlights',
+      callback: async () => {
+        const file = plugin.app.workspace.getActiveFile();
+        if (!file) {
+          new Notice('No file selected for import!');
+          return;
+        }
 
-  contributeSettings(settings: HTMLElement) {
+        try {
+          new Notice(`Starting import of highlights in '${file.path}'...`);
+          const generatedNotes = await generateReferenceNotes(
+            plugin.app,
+            file,
+            this.pluginSettings
+          );
+          const summary =
+            generatedNotes.length > 1
+              ? generatedNotes.map((g) => `- ${g}`).join('\n')
+              : generatedNotes[0];
+          if (this.settings.replaceImportedNoteContents) {
+            await plugin.app.vault.modify(file, summary);
+          } else {
+            const existing = await plugin.app.vault.read(file);
+            await plugin.app.vault.modify(
+              file,
+              summary + '\n\n---\n\n' + existing
+            );
+          }
+          new Notice(`${generatedNotes.length} note(s) generated!`);
+        } catch (err) {
+          console.error(err);
+          new Notice(`Clippings import failed, sorry! ${err}`);
+        }
+      },
+    });
+  }
+
+  contributeSettings(settings: HTMLElement, save: () => Promise<void>) {
     settings.createEl('h3', { text: 'Markdown' });
+    new Setting(settings)
+      .setName('Replace imported note contents')
+      .addToggle(async (toggle) => {
+        if (this.settings.replaceImportedNoteContents == null) {
+          this.settings.replaceImportedNoteContents = true;
+          await save();
+        }
+        toggle.setValue(this.settings.replaceImportedNoteContents);
+
+        toggle.onChange(async (value) => {
+          this.settings.replaceImportedNoteContents = value;
+          await save();
+        });
+      });
     new Setting(settings)
       .setName('Import lists as quotes')
       .addToggle((toggle) => {
         toggle.setDisabled(true); // TODO
         toggle.setTooltip('WIP');
       });
-    new Setting(settings).setName('Import comments').addToggle((toggle) => {
-      toggle.setDisabled(true); // TODO
-      toggle.setTooltip('WIP');
-    });
   }
 }
