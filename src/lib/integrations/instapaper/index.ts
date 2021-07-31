@@ -19,18 +19,14 @@ export default class Instapaper extends Integration<Settings, Secrets> {
   }
 
   constructor(
-    app: App,
+    plugin: Plugin,
     pluginSettings: PluginSettings,
-    integration: {
+    integrationConfig: {
       settings: Settings;
       secrets: Secrets;
     }
   ) {
-    super(app, pluginSettings, integration);
-  }
-
-  contributeToPlugin(plugin: Plugin) {
-    // TODO
+    super(plugin, pluginSettings, integrationConfig);
   }
 
   contributeSettings(settings: HTMLElement, save: () => Promise<void>) {

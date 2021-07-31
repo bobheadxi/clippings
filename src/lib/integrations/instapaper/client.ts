@@ -3,7 +3,7 @@ import qs from 'query-string';
 import crypto from 'crypto';
 
 import request from 'src/lib/util/request';
-import { Secrets, Settings } from '.';
+import { Secrets } from '.';
 
 const instapaper = 'https://www.instapaper.com';
 
