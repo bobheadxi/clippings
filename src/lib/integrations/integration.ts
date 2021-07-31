@@ -8,6 +8,8 @@ export default abstract class Integration<
   IntegrationSettingsT,
   IntegrationsSecretsT
 > {
+  private plugin: Plugin;
+
   /**
    * This ID must also be available as `static id = 'my-id'` on each Integration.
    *
@@ -15,26 +17,33 @@ export default abstract class Integration<
    */
   abstract getID(): string;
 
-  app: App;
-  pluginSettings: PluginSettings;
-  settings: IntegrationSettingsT;
-  secrets: IntegrationsSecretsT;
+  /**
+   * Plugin-wide configuration.
+   */
+  protected pluginSettings: PluginSettings;
+
+  /**
+   * Integration settings.
+   */
+  protected settings: IntegrationSettingsT;
+  /**
+   * Integration secrets.
+   */
+  protected secrets: IntegrationsSecretsT;
 
   constructor(
-    app: App,
+    plugin: Plugin,
     pluginSettings: PluginSettings,
-    integration: {
+    integrationConfig: {
       settings: IntegrationSettingsT;
       secrets: IntegrationsSecretsT;
     }
   ) {
-    this.app = app;
-    this.pluginSettings = pluginSettings;
-    this.settings = integration.settings;
-    this.secrets = integration.secrets;
+    this.plugin = plugin;
+    this.pluginSettings = pluginSettings || {};
+    this.settings = integrationConfig.settings;
+    this.secrets = integrationConfig.secrets;
   }
-
-  abstract contributeToPlugin(plugin: Plugin): void;
 
   abstract contributeSettings(
     settings: HTMLElement,
@@ -48,13 +57,19 @@ export default abstract class Integration<
     };
   }
 
-  createLoginModal(
+  protected createLoginModal(
     title: string,
     description: string,
     loginCallback: (credentials: Credentials) => Promise<void>,
     onClose?: (success: boolean) => void
   ): LoginModal {
-    return new LoginModal(this.app, title, description, loginCallback, onClose);
+    return new LoginModal(
+      this.plugin.app,
+      title,
+      description,
+      loginCallback,
+      onClose
+    );
   }
 }
 

@@ -1,9 +1,7 @@
-import { Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Plugin, PluginSettingTab, Setting, normalizePath } from 'obsidian';
 import deepmerge from 'deepmerge';
 import { integrationsRegistry } from './lib/integrations';
 import Integration from './lib/integrations/integration';
-
-const path = require('path');
 
 import { AllSettings } from './settings';
 
@@ -16,12 +14,16 @@ export default class Clippings extends Plugin {
     const settings = await this.loadSettings();
     for (let EnabledIntegration of integrationsRegistry) {
       console.log(`enabling integration '${EnabledIntegration.id}'`);
-      const int = new EnabledIntegration(this.app, settings.pluginSettings, {
+      const integrationConfig = {
         settings: settings.integrations[EnabledIntegration.id] || {},
         secrets: settings.secrets[EnabledIntegration.id] || {},
-      });
-      int.contributeToPlugin(this);
-      this.integrations.push(int);
+      };
+      const integration = new EnabledIntegration(
+        this,
+        settings.pluginSettings,
+        integrationConfig
+      );
+      this.integrations.push(integration);
     }
 
     this.addSettingTab(new ClippingsSettingsTab(this));
@@ -36,28 +38,38 @@ export default class Clippings extends Plugin {
   }
 
   getSecretsPath() {
-    return path.join(
-      this.app.vault.configDir,
-      `${this.manifest.id}-secrets.json`
+    return normalizePath(
+      `${this.app.vault.configDir}/${this.manifest.id}-secrets.json`
     );
   }
 
   async loadSettings(): Promise<AllSettings> {
+    // load separated secrets
     let secrets = {};
     try {
       secrets = JSON.parse(
         await this.app.vault.adapter.read(this.getSecretsPath())
       );
     } catch (err) {
-      console.log('initializing secrets');
+      console.log(`initializing secrets, could not find existing: ${err}`);
       await this.app.vault.adapter.write(
         this.getSecretsPath(),
         JSON.stringify(secrets)
       );
     }
-    return Object.assign({}, await this.loadData(), {
+
+    // load simple config
+    let safeData = { integrations: {}, pluginSettings: {} };
+    try {
+      safeData = await this.loadData();
+    } catch (err) {
+      console.log(
+        `initializing plugin settings, could not find existing: ${err}`
+      );
+      await this.saveData(safeData);
+    }
+    return Object.assign({}, safeData, {
       secrets,
-      integrations: {},
     }) as AllSettings;
   }
 
@@ -71,9 +83,9 @@ export default class Clippings extends Plugin {
     await this.saveData(cleanSettings);
 
     // save secrets
-    this.app.vault.adapter.write(
+    await this.app.vault.adapter.write(
       this.getSecretsPath(),
-      JSON.stringify(settings.secrets)
+      JSON.stringify(newSettings.secrets)
     );
   }
 }
