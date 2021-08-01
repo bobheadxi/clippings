@@ -52,10 +52,9 @@ export async function getMeta(
   }
 
   function maybeTitleHasAuthor() {
-    return meta.title
-      .split('by ')
-      .pop()
-      ?.split(/ [|\-*]/g)[0];
+    const by = meta.title.split('by ');
+    if (by.length < 2) return null;
+    return by.pop().split(/ [|\-*]/g)[0];
   }
 
   // get other meta
