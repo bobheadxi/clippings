@@ -34,7 +34,7 @@ async function generateNote(
   const renderedHighlights = renderHighlights(highlights);
   const displayMetadata = [
     meta.author,
-    meta.source_name ? `*${meta.source_name}*` : '',
+    meta.publisher ? `*${meta.publisher}*` : '',
   ]
     .filter((v) => v && v.length > 2)
     .join(', ');
@@ -62,7 +62,8 @@ async function generateNote(
     const noteContent = `---
 url: ${meta.url}
 author: ${meta.author || ''}
-source: ${meta.source_name || ''}
+publisher: ${meta.publisher || ''}
+published: ${meta.published.toISOTime()}
 created: ${isoNow()}
 reference_format: v0
 ---
