@@ -1,9 +1,9 @@
 import { TFile, App, normalizePath } from 'obsidian';
 
-import { isoNow } from 'src/lib/util/time';
-import { sanitizeFilename } from 'src/lib/util/file';
+import { isoNow } from 'src/lib/time';
+import { sanitizeFilename } from 'src/lib/file';
 import { PluginSettings } from 'src/settings';
-import { getMeta, SourceMetadata } from 'src/lib/util/url';
+import { getMeta, SourceMetadata } from 'src/lib/url';
 
 function isRelevantLine(str: string) {
   // Obsidian seems to generate '**' from pastes from Google Docs

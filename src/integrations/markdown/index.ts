@@ -1,6 +1,6 @@
 import { Setting, Plugin, Notice } from 'obsidian';
 
-import Integration from 'src/lib/integrations/integration';
+import Integration from 'src/integrations/integration';
 import { PluginSettings } from 'src/settings';
 
 import generateReferenceNotes from './import';

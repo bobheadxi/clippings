@@ -2,7 +2,7 @@ import OAuth from 'oauth-1.0a';
 import qs from 'query-string';
 import crypto from 'crypto';
 
-import request from 'src/lib/util/request';
+import request from 'src/lib/request';
 import { Secrets } from '.';
 
 const instapaper = 'https://www.instapaper.com';

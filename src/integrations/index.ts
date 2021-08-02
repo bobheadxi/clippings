@@ -1,5 +1,5 @@
-import Instapaper from 'src/lib/integrations/instapaper';
-import Markdown from 'src/lib/integrations/markdown';
+import Instapaper from 'src/integrations/instapaper';
+import Markdown from 'src/integrations/markdown';
 
 /**
  * List of enabled integrations that the plugin loads.

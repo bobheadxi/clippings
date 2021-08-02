@@ -1,7 +1,7 @@
 import { Plugin, PluginSettingTab, Setting, normalizePath } from 'obsidian';
 import deepmerge from 'deepmerge';
-import { integrationsRegistry } from './lib/integrations';
-import Integration from './lib/integrations/integration';
+import { integrationsRegistry } from './integrations';
+import Integration from './integrations/integration';
 
 import { AllSettings } from './settings';
 
