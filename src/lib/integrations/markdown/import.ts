@@ -63,7 +63,7 @@ async function generateNote(
 url: ${meta.url}
 author: ${meta.author || ''}
 publisher: ${meta.publisher || ''}
-published: ${meta.published.toISOTime()}
+published: ${meta.published.toISO()}
 created: ${isoNow()}
 reference_format: v0
 ---
