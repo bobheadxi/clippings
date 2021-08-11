@@ -3,7 +3,7 @@ import { Setting, Plugin, Notice } from 'obsidian';
 import Integration from 'src/integrations/integration';
 import { PluginSettings } from 'src/settings';
 
-import generateReferenceNotes from './import';
+import importReferenceNotes from './import';
 
 type Settings = {
   replaceImportedNoteContents?: boolean;
@@ -36,7 +36,7 @@ export default class Markdown extends Integration<Settings, {}> {
 
         try {
           new Notice(`Starting import of highlights in '${file.path}'...`);
-          const generatedNotes = await generateReferenceNotes(
+          const generatedNotes = await importReferenceNotes(
             plugin.app,
             file,
             this.pluginSettings
