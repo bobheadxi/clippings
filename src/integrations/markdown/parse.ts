@@ -11,6 +11,19 @@ type ParsedArticle = {
   highlights: Highlight[];
 };
 
+/**
+ * Generates a reference note from a note with arbitrary numbers of entries in the
+ * following format:
+ *
+ *    > QUOTE
+ *
+ *    OPTIONAL COMMENT
+ *
+ *    [OPTIONAL TITLE](URL)
+ *
+ * This can, for example, be generated with an IFTTT integration between Instapaper and
+ * Google Docs.
+ */
 export function parseArticles(content: string): Record<string, ParsedArticle> {
   const chunks = content
     .split('>')

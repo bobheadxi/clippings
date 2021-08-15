@@ -7,19 +7,6 @@ import { Reference } from 'src/reference';
 import { generateNote } from 'src/reference/write';
 import { parseArticles } from './parse';
 
-/**
- * Generates a reference note from a note with arbitrary numbers of entries in the
- * following format:
- *
- *    > QUOTE
- *
- *    OPTIONAL COMMENT
- *
- *    [OPTIONAL TITLE](URL)
- *
- * This can, for example, be generated with an IFTTT integration between Instapaper and
- * Google Docs.
- */
 export default async function importReferenceNotes(
   app: App,
   file: TFile,
