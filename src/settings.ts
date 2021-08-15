@@ -1,5 +1,7 @@
 export interface PluginSettings {
+  referenceTag?: string;
   newNotesFolder?: string;
+  newNotesTags?: string[];
 }
 
 export interface AllSettings {

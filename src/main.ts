@@ -3,15 +3,18 @@ import deepmerge from 'deepmerge';
 import { integrationsRegistry } from './integrations';
 import Integration from './integrations/integration';
 
-import { AllSettings } from './settings';
+import { AllSettings, PluginSettings } from './settings';
 
 export default class Clippings extends Plugin {
   integrations: Integration<any, any>[] = [];
+  pluginSettings: PluginSettings;
 
   async onload() {
     console.log('loading plugin');
 
     const settings = await this.loadSettings();
+    this.pluginSettings = settings.pluginSettings || {};
+
     for (let EnabledIntegration of integrationsRegistry) {
       console.log(`enabling integration '${EnabledIntegration.id}'`);
       const integrationConfig = {
@@ -20,7 +23,7 @@ export default class Clippings extends Plugin {
       };
       const integration = new EnabledIntegration(
         this,
-        settings.pluginSettings,
+        this.pluginSettings,
         integrationConfig
       );
       this.integrations.push(integration);
@@ -106,14 +109,34 @@ class ClippingsSettingsTab extends PluginSettingTab {
     containerEl.createEl('h2', { text: 'References' });
     {
       new Setting(containerEl)
-        .setName('Folder for new references')
+        .setName('Reference tag')
+        .setDesc('Root tag for reference notes')
         .addText((text) => {
-          text.setDisabled(true); // TODO
+          text.setValue(this.plugin.pluginSettings.referenceTag);
+          text.onChange((value) => {
+            this.plugin.pluginSettings.referenceTag = !value.startsWith('#')
+              ? `#${value}`
+              : value;
+          });
         });
       new Setting(containerEl)
-        .setName('Folder for existing references')
+        .setName('Folder for new references')
         .addText((text) => {
-          text.setDisabled(true); // TODO
+          text.setValue(this.plugin.pluginSettings.newNotesFolder);
+          text.onChange((value) => {
+            this.plugin.pluginSettings.newNotesFolder = value;
+          });
+        });
+      new Setting(containerEl)
+        .setName('Tags for new references')
+        .setDesc('Additional comma-separated tags for new notes')
+        .addText((text) => {
+          text.setValue(this.plugin.pluginSettings.newNotesTags.join(','));
+          text.onChange((value) => {
+            this.plugin.pluginSettings.newNotesTags = value
+              .split(',')
+              .map((t) => (!t.startsWith('#') ? `#${t}` : t));
+          });
         });
       new Setting(containerEl)
         .setName('Import as quotes')

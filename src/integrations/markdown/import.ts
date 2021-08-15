@@ -50,14 +50,10 @@ export default async function importReferenceNotes(
   }
 
   // generate files
-  const creationFolder =
-    settings.newNotesFolder || app.fileManager.getNewFileParent('').path;
   const generatedNotes = [];
   for (let reference of references) {
     try {
-      const referenceFile = await generateNote(app, reference, {
-        creationFolder,
-      });
+      const referenceFile = await generateNote(app, reference, settings);
       generatedNotes.push(
         app.fileManager.generateMarkdownLink(referenceFile, file.path)
       );

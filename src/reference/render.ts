@@ -19,12 +19,12 @@ export function renderHighlights(highlights: Highlight[]) {
     .join('\n\n');
 }
 
-export function renderTags(
-  referenceTag = 'reference',
-  additionalTags = ['review']
-) {
-  const tags = [`${referenceTag}/TODO`, ...additionalTags];
-  return tags.map((t) => `#${t}`).join(' ');
+export function renderTags(referenceTag: string, additionalTags: string[]) {
+  const tags = [
+    `${referenceTag ? referenceTag : '#reference'}/TODO`,
+    ...(additionalTags ? additionalTags : ['#review']),
+  ];
+  return tags.join(' ');
 }
 
 export function renderHeader(meta: SourceMetadata) {

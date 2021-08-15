@@ -1,6 +1,7 @@
 import { App, normalizePath, stringifyYaml } from 'obsidian';
 
 import { Reference } from 'src/reference';
+import { PluginSettings } from 'src/settings';
 import {
   buildFrontmatter,
   renderHighlights,
@@ -11,7 +12,7 @@ import {
 export async function generateNote(
   app: App,
   reference: Reference,
-  opts: { creationFolder: string }
+  settings: PluginSettings
 ) {
   const { filename, meta, highlights } = reference;
   const renderedHighlights = renderHighlights(highlights);
@@ -40,7 +41,7 @@ export async function generateNote(
 ${stringifyYaml(buildFrontmatter(meta))}
 ---
 
-${renderTags()}
+${renderTags(settings.referenceTag, settings.newNotesTags)}
 ${renderHeader(meta)}
 
 TODO
@@ -52,7 +53,12 @@ TODO
 ${renderedHighlights}`;
 
     referenceFile = await app.vault.create(
-      normalizePath(`${opts.creationFolder}/${filename}`),
+      normalizePath(
+        `${
+          settings.newNotesFolder ||
+          this.app.fileManager.getNewFileParent('').path
+        }/${filename}`
+      ),
       noteContent
     );
   }
