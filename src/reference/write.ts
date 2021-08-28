@@ -44,7 +44,7 @@ ${stringifyYaml(buildFrontmatter(meta))}
 ${renderTags(settings.referenceTag, settings.newNotesTags)}
 ${renderHeader(meta)}
 
-TODO
+${reference.comment || 'TODO'}
 
 ---
 

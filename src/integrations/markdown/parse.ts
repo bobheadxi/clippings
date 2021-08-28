@@ -1,13 +1,10 @@
 import { Highlight } from 'src/reference';
+import * as parseutil from './parseutil';
 
-function isRelevantLine(str: string) {
-  // Obsidian seems to generate '**' from pastes from Google Docs
-  return str.length > 2;
-}
-
-type ParsedArticle = {
+export type ParsedReference = {
   url?: string;
   title?: string;
+  comment?: string;
   highlights: Highlight[];
 };
 
@@ -15,7 +12,7 @@ type ParsedArticle = {
  * Generates a reference note from a note with arbitrary numbers of entries in the
  * following format:
  *
- *    > QUOTE
+ *    > HIGHLIGHT
  *
  *    OPTIONAL COMMENT
  *
@@ -24,57 +21,65 @@ type ParsedArticle = {
  * This can, for example, be generated with an IFTTT integration between Instapaper and
  * Google Docs.
  */
-export function parseArticles(content: string): Record<string, ParsedArticle> {
-  const chunks = content
-    .split('>')
-    .filter(isRelevantLine) // drop noise
-    .map((c) => `>${c}`); // add back quotes
-  if (!chunks || chunks.length === 0) {
-    throw new Error('Note content does not look like highlights');
-  }
+export function parseArticles(
+  content: string
+): Record<string, ParsedReference> {
+  const delimiter = parseutil.detectHighlightDelimiter(content);
+  const chunks = parseutil.splitChunks(content, delimiter);
 
-  const articles: Record<string, ParsedArticle> = {};
+  const { delim, indent } = delimiter;
+  const prefix = indent + delim;
+
+  const articles: Record<string, ParsedReference> = {};
+  let previous: ParsedReference;
   for (let chunk of chunks) {
-    const lines = chunk.split('\n');
-    const article: ParsedArticle = {
-      url: null,
-      title: null,
-      highlights: [],
-    };
-    for (let l of lines) {
-      const line = l.trim();
-      if (!line) {
-        continue;
-      }
-      console.log(article.highlights);
-      if (line.startsWith('>')) {
-        article.highlights.push({ quote: line });
-      } else if (line.startsWith('[')) {
-        const parts = line.split(']');
-        article.title = parts[0].slice(1).trim();
-        article.url = parts[1].slice(1, -1).trim();
+    const article: ParsedReference = { highlights: [] };
+
+    const lines = chunk.split('\n').filter(parseutil.isRelevantLine);
+    for (let line of lines) {
+      // Figure out what this is and include it in the 'article' detected in this chunk.
+      if (line.startsWith(prefix)) {
+        // Capture highlight if it starts with our prefix
+        const cleaned = line.slice(prefix.length).trim();
+        if (cleaned) article.highlights.push({ quote: cleaned });
+      } else if (line.replace(delim, '').trim().startsWith('[')) {
+        // Capture source if there is a link near start of line
+        const { title, url, comment } = parseutil.parseLink(line.trim());
+        article.title = title;
+        article.url = url;
+        article.comment = comment;
       } else {
-        // try to capture as comment
-        if (!isRelevantLine(line) || article.highlights.length != 1) {
+        // Capture as comment
+        if (article.highlights.length < 1) {
           continue;
         }
-        article.highlights[article.highlights.length - 1].comment = line;
+        let cleaned = line.trim();
+        if (cleaned.startsWith(delim)) {
+          cleaned = cleaned.slice(delim.length);
+        }
+        article.highlights[article.highlights.length - 1].comment = cleaned;
       }
     }
+
     if (!article.url) {
-      console.log('Discarding chunk with no URL', article);
+      if (previous) {
+        previous.highlights = previous.highlights.concat(article.highlights);
+      } else {
+        console.log(
+          'Discarding chunk with no URL and no preceding source',
+          article
+        );
+      }
       continue;
     }
 
     if (!articles[article.url]) {
       articles[article.url] = article;
+      previous = articles[article.url];
     } else {
       articles[article.url].highlights = articles[
         article.url
       ].highlights.concat(article.highlights);
-      if (!articles[article.url]) {
-        articles[article.url].title = article.title;
-      }
     }
   }
 

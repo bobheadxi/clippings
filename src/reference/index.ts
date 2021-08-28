@@ -7,8 +7,11 @@ export type Highlight = {
 
 export type Reference = {
   meta: SourceMetadata;
-  filename: string;
+  comment?: string;
   highlights: Highlight[];
+
+  // where this reference is saved
+  filename: string;
 };
 
 export enum ReferenceVersion {

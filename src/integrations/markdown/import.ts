@@ -28,7 +28,12 @@ export default async function importReferenceNotes(
     try {
       const meta = await getMeta(source.title, url);
       const filename = `${sanitizeFilename(meta.title)}.md`;
-      references.push({ meta, filename, highlights: source.highlights });
+      references.push({
+        meta,
+        highlights: source.highlights,
+        comment: source.comment,
+        filename,
+      });
     } catch (err) {
       throw new Error(
         `Failed to get metadata for source '${source.url}': ${err}`
