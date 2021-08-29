@@ -1,5 +1,7 @@
 # Contributing
 
+Ideas? Questions? Feel free to drop by the [discussions](https://github.com/bobheadxi/clippings/discussions)!
+
 ## Building the plugin
 
 ### Development builds
@@ -33,3 +35,9 @@ npm run build
 ```
 
 Builds are output to `dist/`.
+
+## Developing integrations
+
+Integrations are implemented in `src/integrations`, and they are how Clippings ingests sources and highlights.
+
+To learn more about what Integrations are capable of and how to create new ones, see the [documentation for the `abstract class Integration`](src/integrations/integration.ts).
