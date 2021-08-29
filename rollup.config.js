@@ -24,7 +24,10 @@ export default {
   },
   external: ['obsidian'],
   plugins: [
-    typescript(),
+    typescript({
+      sourceMap: !isProd,
+      inlineSources: !isProd,
+    }),
     nodeResolve({browser: true}),
     commonjs(),
     json(),
