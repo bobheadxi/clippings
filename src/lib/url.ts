@@ -3,15 +3,27 @@ import { DateTime } from 'luxon';
 import request from './request';
 
 function maybeRSSHasPublisher(doc: Document) {
-  const rss = doc
-    .querySelector('link[type="application/rss+xml"]')
-    ?.getAttribute('title');
-  if (!rss || rss.toLowerCase().contains('rss')) return null;
-  return rss;
+  const rss =
+    doc.querySelector('link[type="application/rss+xml"]') ||
+    doc.querySelector('link[type="application/atom+xml"]');
+  if (!rss) return null;
+
+  console.log(rss);
+  const rssTitle = rss.getAttribute('title');
+  if (rssTitle && !rssTitle.toLowerCase().contains('rss')) {
+    return rssTitle;
+  }
+
+  // try URL instead
+  try {
+    return new URL(rss.getAttribute('href')).hostname;
+  } catch (err) {
+    return null;
+  }
 }
 
 function maybeTitleHasAuthor(title: string) {
-  const by = title.split('by ');
+  const by = title.split('by ', 2);
   if (by.length < 2) return null;
   return by.pop().split(/ [|\-*]/g)[0];
 }
@@ -37,7 +49,9 @@ class JSONLDData {
     let value;
     this.data.find((item) => {
       if (!item) return;
-      value = property.split('.').reduce((o, i) => o[i], item);
+      value = property
+        .split('.')
+        .reduce((o, i) => (o ? o[i] : undefined), item);
       return !!value || value === 0 || value === true;
     });
     return value;
@@ -81,11 +95,15 @@ export async function getMeta(
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const jsonld = await maybeJSONLD(doc);
 
+  // get a better canonical title if possible
+  // TODO: toggle
   const title =
-    doc.querySelector('meta[property="og:title"]').getText() ||
+    doc.querySelector('meta[property="og:title"]')?.getText() ||
     doc.head.title ||
     jsonld?.get('headline') ||
     providedTitle;
+
+  // get a better canonical URL if available
   const url =
     doc.querySelector('meta[property="og:url"]')?.getAttribute('content') ||
     doc.querySelector('link[rel="canonical"]')?.getAttribute('href') ||
@@ -94,7 +112,7 @@ export async function getMeta(
   // refer to https://sourcegraph.com/github.com/microlinkhq/metascraper/-/tree/packages when in doubt
   const meta: SourceMetadata = {
     url,
-    title,
+    title: title.trim(),
 
     description:
       (
@@ -114,6 +132,7 @@ export async function getMeta(
       doc
         .querySelector('meta[property="og:site_name"]')
         ?.getAttribute('content') ||
+      jsonld?.get('isPartOf.name') ||
       maybeRSSHasPublisher(doc) ||
       new URL(url).hostname,
 
