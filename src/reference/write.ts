@@ -55,8 +55,7 @@ ${renderedHighlights}`;
     referenceFile = await app.vault.create(
       normalizePath(
         `${
-          settings.newNotesFolder ||
-          this.app.fileManager.getNewFileParent('').path
+          settings.newNotesFolder || app.fileManager.getNewFileParent('').path
         }/${filename}`
       ),
       noteContent

@@ -7,7 +7,7 @@ export function buildFrontmatter(meta: SourceMetadata) {
     url: meta.url,
     author: meta.author || '',
     publisher: meta.publisher || '',
-    published: meta.published.toISO(),
+    published: meta.published?.toISO(),
     created: isoNow(),
     reference_format: ReferenceVersion.V0,
   };
@@ -15,7 +15,9 @@ export function buildFrontmatter(meta: SourceMetadata) {
 
 export function renderHighlights(highlights: Highlight[]) {
   return highlights
-    .map((h) => `### TODO\n\n${h.quote}${h.comment ? `\n\n${h.comment}` : ''}`)
+    .map(
+      (h) => `### TODO\n\n> ${h.quote}${h.comment ? `\n\n${h.comment}` : ''}`
+    )
     .join('\n\n');
 }
 
@@ -40,11 +42,10 @@ ${
     ? `
 > ${meta.description}`
     : ''
-}
-${
-  displayMetadata
-    ? `
+}${
+    displayMetadata
+      ? `
 – ${displayMetadata}`
-    : ''
-}`;
+      : ''
+  }`;
 }
