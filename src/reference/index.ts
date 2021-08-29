@@ -1,4 +1,4 @@
-import { SourceMetadata } from 'src/lib/url';
+import { Metadata } from 'src/lib/url';
 
 export type Highlight = {
   quote: string;
@@ -6,7 +6,7 @@ export type Highlight = {
 };
 
 export type Reference = {
-  meta: SourceMetadata;
+  meta: Metadata;
   comment?: string;
   highlights: Highlight[];
 
