@@ -1,8 +1,9 @@
 import { describe, test, expect } from '@jest/globals';
+import { IntegrationReference } from '../integration';
 
 import * as parse from './parse';
 
-function expectBasicSamples(refs: Record<string, parse.ParsedReference>) {
+function expectBasicSamples(refs: Record<string, IntegrationReference>) {
   expect(Object.keys(refs)).toHaveLength(2);
 
   const lookingClosely = refs['https://craigmod.com/essays/looking_closely/'];

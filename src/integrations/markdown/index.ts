@@ -1,9 +1,11 @@
 import { Setting, Plugin, Notice } from 'obsidian';
 
-import Integration from 'src/integrations/integration';
+import Integration, {
+  IntegrationReference,
+} from 'src/integrations/integration';
 import { PluginSettings } from 'src/settings';
 
-import importReferenceNotes from './import';
+import { parseArticles } from './parse';
 
 type Settings = {
   replaceImportedNoteContents?: boolean;
@@ -38,22 +40,35 @@ export default class Markdown extends Integration<Settings, {}> {
 
         try {
           new Notice(`Starting import of highlights in '${file.path}'...`);
-          const generatedNotes = await importReferenceNotes(
-            app,
-            file,
-            this.pluginSettings
+          let content = '';
+          try {
+            content = await app.vault.read(file);
+          } catch (err) {
+            throw new Error(`Failed to read note '${file.path}': ${err}`);
+          }
+
+          // parse content
+          const articles = parseArticles(content);
+
+          // import notes
+          const references: IntegrationReference[] = Object.entries(articles);
+          const generatedNotes = await this.importReferences(references);
+          const notesLinks = generatedNotes.map((n) =>
+            app.fileManager.generateMarkdownLink(n, file.path)
           );
+
+          // report results
           const summary =
-            generatedNotes.length > 1
-              ? generatedNotes.map((g) => `- ${g}`).join('\n')
-              : generatedNotes[0];
+            notesLinks.length > 1
+              ? notesLinks.map((g) => `- ${g}`).join('\n')
+              : notesLinks[0];
           if (this.settings.replaceImportedNoteContents) {
             await app.vault.modify(file, summary);
           } else {
             const existing = await app.vault.read(file);
             await app.vault.modify(file, summary + '\n\n---\n\n' + existing);
           }
-          new Notice(`${generatedNotes.length} note(s) generated:\n${summary}`);
+          new Notice(`${notesLinks.length} note(s) generated:\n${summary}`);
         } catch (err) {
           console.error(err);
           new Notice(`Clippings import failed, sorry! ${err}`);

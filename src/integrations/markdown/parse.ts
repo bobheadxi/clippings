@@ -1,12 +1,6 @@
-import { Highlight } from 'src/reference';
 import * as parseutil from './parseutil';
 
-export type ParsedReference = {
-  url?: string;
-  title?: string;
-  comment?: string;
-  highlights: Highlight[];
-};
+import { IntegrationReference } from '../integration';
 
 /**
  * Generates a reference note from a note with arbitrary numbers of entries in the
@@ -23,17 +17,17 @@ export type ParsedReference = {
  */
 export function parseArticles(
   content: string
-): Record<string, ParsedReference> {
+): Record<string, IntegrationReference> {
   const delimiter = parseutil.detectHighlightDelimiter(content);
   const chunks = parseutil.splitChunks(content, delimiter);
 
   const { delim, indent } = delimiter;
   const prefix = indent + delim;
 
-  const articles: Record<string, ParsedReference> = {};
-  let previous: ParsedReference;
+  const articles: Record<string, IntegrationReference> = {};
+  let previous: IntegrationReference;
   for (let chunk of chunks) {
-    const article: ParsedReference = { highlights: [] };
+    const article: IntegrationReference = { highlights: [] };
 
     const lines = chunk.split('\n').filter(parseutil.isRelevantLine);
     for (let line of lines) {
