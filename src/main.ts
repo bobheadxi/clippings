@@ -138,12 +138,6 @@ class ClippingsSettingsTab extends PluginSettingTab {
               .map((t) => (!t.startsWith('#') ? `#${t}` : t));
           });
         });
-      new Setting(containerEl)
-        .setName('Import as quotes')
-        .addToggle((toggle) => {
-          toggle.setDisabled(true); // TODO
-          toggle.setTooltip('WIP');
-        });
     }
 
     // Integrations options
