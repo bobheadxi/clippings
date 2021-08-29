@@ -24,11 +24,13 @@ export default class Markdown extends Integration<Settings, {}> {
     }
   ) {
     super(plugin, pluginSettings, integrationConfig);
+    const app = plugin.app;
+
     plugin.addCommand({
       id: 'markdown.import',
       name: 'Import note as highlights',
       callback: async () => {
-        const file = plugin.app.workspace.getActiveFile();
+        const file = app.workspace.getActiveFile();
         if (!file) {
           new Notice('No file selected for import!');
           return;
@@ -37,7 +39,7 @@ export default class Markdown extends Integration<Settings, {}> {
         try {
           new Notice(`Starting import of highlights in '${file.path}'...`);
           const generatedNotes = await importReferenceNotes(
-            plugin.app,
+            app,
             file,
             this.pluginSettings
           );
@@ -46,15 +48,12 @@ export default class Markdown extends Integration<Settings, {}> {
               ? generatedNotes.map((g) => `- ${g}`).join('\n')
               : generatedNotes[0];
           if (this.settings.replaceImportedNoteContents) {
-            await plugin.app.vault.modify(file, summary);
+            await app.vault.modify(file, summary);
           } else {
-            const existing = await plugin.app.vault.read(file);
-            await plugin.app.vault.modify(
-              file,
-              summary + '\n\n---\n\n' + existing
-            );
+            const existing = await app.vault.read(file);
+            await app.vault.modify(file, summary + '\n\n---\n\n' + existing);
           }
-          new Notice(`${generatedNotes.length} note(s) generated!`);
+          new Notice(`${generatedNotes.length} note(s) generated:\n${summary}`);
         } catch (err) {
           console.error(err);
           new Notice(`Clippings import failed, sorry! ${err}`);
@@ -78,12 +77,6 @@ export default class Markdown extends Integration<Settings, {}> {
           this.settings.replaceImportedNoteContents = value;
           await save();
         });
-      });
-    new Setting(settings)
-      .setName('Import lists as quotes')
-      .addToggle((toggle) => {
-        toggle.setDisabled(true); // TODO
-        toggle.setTooltip('WIP');
       });
   }
 }

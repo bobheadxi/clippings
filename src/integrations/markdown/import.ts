@@ -15,11 +15,11 @@ export default async function importReferenceNotes(
   let content = '';
   try {
     content = await app.vault.read(file);
-    console.log('generating reference notes', { file, content });
   } catch (err) {
     throw new Error(`Failed to read note '${file.path}': ${err}`);
   }
 
+  // parse content
   const articles = parseArticles(content);
 
   // fetch metadata
@@ -35,9 +35,7 @@ export default async function importReferenceNotes(
         filename,
       });
     } catch (err) {
-      throw new Error(
-        `Failed to get metadata for source '${source.url}': ${err}`
-      );
+      throw new Error(`Failed to get metadata for source '${url}': ${err}`);
     }
   }
 
