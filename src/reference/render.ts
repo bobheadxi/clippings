@@ -10,7 +10,7 @@ export function buildFrontmatter(meta: Metadata) {
     publisher: meta.publisher || '',
     published: meta.published?.toISO(),
     created: isoNow(),
-    reference_format: ReferenceVersion.V0,
+    reference_format: ReferenceVersion.V1,
   };
 }
 

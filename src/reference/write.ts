@@ -41,10 +41,11 @@ export async function generateNote(
 ${stringifyYaml(buildFrontmatter(meta))}
 ---
 
-${renderTags(settings.referenceTag, settings.newNotesTags)}
 ${renderHeader(meta)}
 
 ${reference.comment || 'TODO'}
+
+${renderTags(settings.referenceTag, settings.newNotesTags)}
 
 ## Highlights
 
