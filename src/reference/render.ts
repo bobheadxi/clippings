@@ -1,6 +1,6 @@
 import { Metadata } from '@bobheadxi/metadata';
 
-import { Highlight, ReferenceVersion } from 'src/reference';
+import { Highlight, CURRENT_REFERENCE_VERSION } from 'src/reference';
 import { isoNow } from 'src/lib/time';
 
 export function buildFrontmatter(meta: Metadata) {
@@ -10,7 +10,7 @@ export function buildFrontmatter(meta: Metadata) {
     publisher: meta.publisher || '',
     published: meta.published?.toISO(),
     created: isoNow(),
-    reference_format: ReferenceVersion.V1,
+    reference_format: CURRENT_REFERENCE_VERSION,
   };
 }
 

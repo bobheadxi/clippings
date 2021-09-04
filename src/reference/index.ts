@@ -19,4 +19,4 @@ export enum ReferenceVersion {
   V1 = 'v1',
 }
 
-export const CURRENT_REFERENCE_VERSION = ReferenceVersion.V0;
+export const CURRENT_REFERENCE_VERSION = ReferenceVersion.V1;
