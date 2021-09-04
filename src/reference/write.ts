@@ -46,8 +46,6 @@ ${renderHeader(meta)}
 
 ${reference.comment || 'TODO'}
 
----
-
 ## Highlights
 
 ${renderedHighlights}`;
