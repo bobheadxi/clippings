@@ -1,8 +1,9 @@
+import { Metadata } from '@bobheadxi/metadata';
+
 import { Highlight, ReferenceVersion } from 'src/reference';
-import { SourceMetadata } from 'src/lib/url';
 import { isoNow } from 'src/lib/time';
 
-export function buildFrontmatter(meta: SourceMetadata) {
+export function buildFrontmatter(meta: Metadata) {
   return {
     url: meta.url,
     author: meta.author || '',
@@ -29,7 +30,7 @@ export function renderTags(referenceTag: string, additionalTags: string[]) {
   return tags.join(' ');
 }
 
-export function renderHeader(meta: SourceMetadata) {
+export function renderHeader(meta: Metadata) {
   const displayMetadata = [
     meta.author,
     meta.publisher ? `*${meta.publisher}*` : '',
