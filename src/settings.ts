@@ -9,3 +9,5 @@ export interface AllSettings {
   secrets?: Record<string, any>;
   pluginSettings?: PluginSettings;
 }
+
+export const defaultReferenceTag = '#reference';

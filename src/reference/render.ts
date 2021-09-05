@@ -1,16 +1,25 @@
-import { Metadata } from '@bobheadxi/metadata';
+import { Metadata } from 'src/lib/url';
 
-import { Highlight, CURRENT_REFERENCE_VERSION } from 'src/reference';
+import { defaultReferenceTag } from 'src/settings';
+import { Highlight, ReferenceVersion } from 'src/reference';
 import { isoNow } from 'src/lib/time';
 
-export function buildFrontmatter(meta: Metadata) {
+// Correspond to current version of frontmatter
+import { Frontmatter } from './migrations/v1';
+
+type BaseFrontmatter = { created: string; reference_format: ReferenceVersion };
+
+export function buildFrontmatter(
+  meta: Metadata
+): Frontmatter & BaseFrontmatter {
   return {
+    ...Frontmatter,
+    created: isoNow(),
+
     url: meta.url,
     author: meta.author || '',
     publisher: meta.publisher || '',
     published: meta.published?.toISO(),
-    created: isoNow(),
-    reference_format: CURRENT_REFERENCE_VERSION,
   };
 }
 
@@ -24,7 +33,7 @@ export function renderHighlights(highlights: Highlight[]) {
 
 export function renderTags(referenceTag: string, additionalTags: string[]) {
   const tags = [
-    `${referenceTag ? referenceTag : '#reference'}/TODO`,
+    `${referenceTag ? referenceTag : defaultReferenceTag}/TODO`,
     ...(additionalTags ? additionalTags : ['#review']),
   ];
   return tags.join(' ');

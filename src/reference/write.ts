@@ -38,8 +38,7 @@ export async function generateNote(
     console.log(`Generating '${filename}'`, reference);
 
     const noteContent = `---
-${stringifyYaml(buildFrontmatter(meta))}
----
+${stringifyYaml(buildFrontmatter(meta))}---
 
 ${renderHeader(meta)}
 

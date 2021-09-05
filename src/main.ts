@@ -1,9 +1,18 @@
-import { Plugin, PluginSettingTab, Setting, normalizePath } from 'obsidian';
+import {
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  normalizePath,
+  parseFrontMatterEntry,
+  stringifyYaml,
+  Notice,
+  TFile,
+} from 'obsidian';
 import deepmerge from 'deepmerge';
 import { integrationsRegistry } from './integrations';
 import Integration from './integrations/integration';
-
-import { AllSettings, PluginSettings } from './settings';
+import runMigrations, { CurrentVersion } from './reference/migrations';
+import { AllSettings, defaultReferenceTag, PluginSettings } from './settings';
 
 export default class Clippings extends Plugin {
   integrations: Integration<any, any>[] = [];
@@ -31,9 +40,28 @@ export default class Clippings extends Plugin {
 
     this.addSettingTab(new ClippingsSettingsTab(this));
 
-    this.registerInterval(
-      window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000)
-    );
+    this.addCommand({
+      id: 'migrate.single',
+      name: `Migrate current note to format ${CurrentVersion}`,
+      callback: async () => {
+        const file = this.app.workspace.getActiveFile();
+        if (!file) {
+          new Notice('No active file found!');
+          return;
+        }
+        await this.maybeMigrateNote(file);
+      },
+    });
+    this.addCommand({
+      id: 'migrate.all',
+      name: `Migrate all notes to format ${CurrentVersion}`,
+      callback: async () => {
+        const files = this.app.vault.getMarkdownFiles();
+        for (let file of files) {
+          await this.maybeMigrateNote(file);
+        }
+      },
+    });
   }
 
   onunload() {
@@ -91,6 +119,29 @@ export default class Clippings extends Plugin {
       JSON.stringify(newSettings.secrets)
     );
   }
+
+  async maybeMigrateNote(file: TFile) {
+    const meta = this.app.metadataCache.getFileCache(file);
+    if (
+      meta.tags?.find(
+        (tc) =>
+          `#${tc.tag}` === this.pluginSettings.referenceTag ||
+          defaultReferenceTag
+      )
+    ) {
+      console.log(`migrating '${file.path}'`);
+      const fileContents = await this.app.vault.read(file);
+      const frontmatter = { ...meta.frontmatter, position: undefined as any };
+      const migrated = runMigrations(file.path, frontmatter, fileContents);
+      await this.app.vault.modify(
+        file,
+        `---
+${stringifyYaml(migrated.frontmatter)}---
+
+${migrated.body}`
+      );
+    }
+  }
 }
 
 class ClippingsSettingsTab extends PluginSettingTab {
@@ -112,7 +163,9 @@ class ClippingsSettingsTab extends PluginSettingTab {
         .setName('Reference tag')
         .setDesc('Root tag for reference notes')
         .addText((text) => {
-          text.setValue(this.plugin.pluginSettings.referenceTag);
+          text.setValue(
+            this.plugin.pluginSettings.referenceTag || defaultReferenceTag
+          );
           text.onChange((value) => {
             this.plugin.pluginSettings.referenceTag = !value.startsWith('#')
               ? `#${value}`
