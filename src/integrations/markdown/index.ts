@@ -51,7 +51,7 @@ export default class Markdown extends Integration<Settings, {}> {
           const articles = parseArticles(content);
 
           // import notes
-          const references: IntegrationReference[] = Object.entries(articles);
+          const references = Object.values(articles);
           const generatedNotes = await this.importReferences(references);
           const notesLinks = generatedNotes.map((n) =>
             app.fileManager.generateMarkdownLink(n, file.path)

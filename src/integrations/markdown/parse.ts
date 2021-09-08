@@ -19,6 +19,7 @@ export function parseArticles(
   content: string
 ): Record<string, IntegrationReference> {
   const delimiter = parseutil.detectHighlightDelimiter(content);
+  console.log('Inferred delimiter', delimiter);
   const chunks = parseutil.splitChunks(content, delimiter);
 
   const { delim, indent } = delimiter;

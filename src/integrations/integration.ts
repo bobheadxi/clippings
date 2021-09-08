@@ -98,6 +98,7 @@ export default abstract class Integration<
           filename,
         });
       } catch (err) {
+        console.error(`Failed to get metadata for source: ${err}`, { ref });
         throw new Error(
           `Failed to get metadata for source '${ref.title || ref.url}': ${err}`
         );
