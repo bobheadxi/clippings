@@ -1,4 +1,4 @@
-# 🔖 Clippings
+# 🌱 Clippings
 
 An opinionated and minimal highlights and references importer and manager for [Obsidian](https://obsidian.md/).
 Clippings is geared towards casuals like myself, who just want to keep track of and review their Instapaper highlights and haphazardly copy-pasted notes from articles and websites, and easily reference them throughout their notes.
