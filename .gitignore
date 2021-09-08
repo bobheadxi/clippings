@@ -4,3 +4,4 @@ package-lock.json
 dist
 data.json
 .env
+coverage
