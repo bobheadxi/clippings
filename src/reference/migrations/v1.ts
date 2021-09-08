@@ -27,6 +27,12 @@ export default class V1 implements Migration {
   ): { frontmatter: Frontmatter; body: string } {
     frontmatter.reference_format = this.version();
 
+    // zero-value some defaults
+    frontmatter.author = frontmatter.author || '';
+    frontmatter.publisher = frontmatter.publisher || frontmatter.source || '';
+    frontmatter.source = undefined;
+    frontmatter.published = frontmatter.published || '';
+
     // Remove divider
     body = body.replace('\n---\n\n', '\n');
 
