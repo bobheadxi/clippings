@@ -50,12 +50,14 @@ export function renderHeader(meta: Metadata) {
 ${
   meta.description
     ? `
-> ${meta.description}`
+> ${meta.description}
+`
     : ''
 }${
     displayMetadata
       ? `
-– ${displayMetadata}`
+– ${displayMetadata}
+`
       : ''
   }`;
 }
