@@ -8,7 +8,7 @@ export class Frontmatter {
   url: string;
   author: string;
   publisher: string;
-  published?: string;
+  published: string;
 }
 
 export default class V1 implements Migration {

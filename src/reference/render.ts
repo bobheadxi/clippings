@@ -19,7 +19,7 @@ export function buildFrontmatter(
     url: meta.url,
     author: meta.author || '',
     publisher: meta.publisher || '',
-    published: meta.published?.toISO(),
+    published: meta.published?.toISO() || '',
   };
 }
 
