@@ -93,6 +93,19 @@ stuff
     expect(chunks).toHaveLength(3);
   });
 
+  test('- with comment', () => {
+    const chunks = parseutil.splitChunks(
+      `
+- stuff
+  - quote
+  - quote
+    - comment
+`,
+      { delim: parseutil.HighlightDelimiter.DASH, indent: '  ' }
+    );
+    expect(chunks).toHaveLength(3);
+  });
+
   test('- complex case', () => {
     const chunks = parseutil.splitChunks(
       `

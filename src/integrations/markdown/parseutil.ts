@@ -51,9 +51,7 @@ export function detectHighlightDelimiter(content: string): Delimiter {
     const line = l.trimLeft();
     const indent = l.split(line).join('');
     if (!line || !delimiters.includes(line[0])) return;
-    // Weight last delimiters more
-    counts[line[0]][indent] =
-      (counts[line[0]][indent] || 0) + (i >= lines.length - 1 ? 2 : 1);
+    counts[line[0]][indent] = (counts[line[0]][indent] || 0) + 1;
   });
 
   let mostCommon: Delimiter & { count: number } = {
