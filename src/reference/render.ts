@@ -26,7 +26,10 @@ export function buildFrontmatter(
 export function renderHighlights(highlights: Highlight[]) {
   return highlights
     .map(
-      (h) => `### TODO\n\n> ${h.quote}${h.comment ? `\n\n${h.comment}` : ''}`
+      (h) =>
+        `### TODO${h.location ? ` (${h.location})` : ''}\n\n> ${h.quote}${
+          h.comment ? `\n\n${h.comment}` : ''
+        }`
     )
     .join('\n\n');
 }
@@ -46,7 +49,7 @@ export function renderHeader(meta: Metadata) {
   ]
     .filter((v) => v && v.length > 2)
     .join(', ');
-  return `# [${meta.title}](${meta.url})
+  return `# ${meta.url ? `[${meta.title}](${meta.url})` : `${meta.title}`}
 ${
   meta.description
     ? `

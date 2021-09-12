@@ -1,7 +1,7 @@
 import { Plugin } from 'obsidian';
 import { PluginSettings as PluginSettings } from 'src/settings';
 import { sanitizeFilename } from 'src/lib/file';
-import { getMeta } from 'src/lib/url';
+import { getMeta, Metadata } from 'src/lib/url';
 import { Reference, Highlight } from 'src/reference';
 import { generateNote } from 'src/reference/write';
 
@@ -13,6 +13,7 @@ import { LoginModal, Credentials } from './login';
 export type IntegrationReference = {
   url?: string;
   title?: string;
+  author?: string;
   comment?: string;
   highlights: Highlight[];
 };
@@ -89,7 +90,12 @@ export default abstract class Integration<
     const references: Reference[] = [];
     for (let ref of importRefs) {
       try {
-        const meta = await getMeta(ref.title, ref.url);
+        let meta: Metadata;
+        if (ref.url) {
+          meta = await getMeta(ref.title, ref.url);
+        } else {
+          meta = { ...ref };
+        }
         const filename = `${sanitizeFilename(meta.title)}.md`;
         references.push({
           meta,

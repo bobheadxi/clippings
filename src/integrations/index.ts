@@ -1,7 +1,8 @@
-import Instapaper from 'src/integrations/instapaper';
 import Markdown from 'src/integrations/markdown';
+import IBooks from 'src/integrations/ibooks';
+// import Instapaper from 'src/integrations/instapaper';
 
 /**
  * List of enabled integrations that the plugin loads.
  */
-export const integrationsRegistry = [Instapaper, Markdown];
+export default [Markdown, IBooks];

@@ -9,7 +9,7 @@ import {
   TFile,
 } from 'obsidian';
 import deepmerge from 'deepmerge';
-import { integrationsRegistry } from './integrations';
+import integrationsRegistry from './integrations';
 import Integration from './integrations/integration';
 import runMigrations, { CurrentVersion } from './reference/migrations';
 import { AllSettings, defaultReferenceTag, PluginSettings } from './settings';

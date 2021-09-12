@@ -3,6 +3,7 @@ import { Metadata } from 'src/lib/url';
 export type Highlight = {
   quote: string;
   comment?: string;
+  location?: string;
 };
 
 export type Reference = {
