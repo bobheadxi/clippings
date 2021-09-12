@@ -22,11 +22,11 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@bobheadxi/metadata": "^0.1.0",
-    "deepmerge": "^4.2.2",
-    "luxon": "^2.0.1",
-    "oauth-1.0a": "^2.2.6",
-    "obsidian": "^0.12.11",
-    "query-string": "^7.0.1"
+    "@bobheadxi/metadata": "0.1.2",
+    "deepmerge": "4.2.2",
+    "luxon": "2.0.2",
+    "oauth-1.0a": "2.2.6",
+    "obsidian": "0.12.11",
+    "query-string": "7.0.1"
   }
 }
