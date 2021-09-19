@@ -28,6 +28,11 @@ export default class InstapaperClient {
     });
   }
 
+  /**
+   * Performa an authenticated request to the given Instapaper API endpoint.
+   *
+   * @private
+   */
   private async instapaperRequest(endpoint: string, data: any = {}) {
     const req = {
       url: `${instapaper}/api/1/${endpoint}`,
@@ -38,12 +43,14 @@ export default class InstapaperClient {
     return await request({
       url: req.url,
       method: req.method,
-      // TODO: renable if Obsidian supports headers
-      // headers: { ...this.client.toHeader(formAuth) },
+      headers: { ...this.client.toHeader(formAuth) },
       body: qs.stringify(formAuth),
     });
   }
 
+  /**
+   * Authenticates this client using the given credentials.
+   */
   async logIn(
     email: string,
     password: string
@@ -67,6 +74,9 @@ export default class InstapaperClient {
     return accessToken;
   }
 
+  /**
+   * Attempts to verify the given credentials.
+   */
   async verifyLogin() {
     try {
       const resp = await this.instapaperRequest('account/verify_credentials');
@@ -78,6 +88,9 @@ export default class InstapaperClient {
     }
   }
 
+  /**
+   * Lists saved items for the authenticated account.
+   */
   async listBookmarks() {
     try {
       const resp = await this.instapaperRequest('bookmarks/list', { limit: 1 });
