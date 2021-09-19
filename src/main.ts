@@ -175,7 +175,9 @@ class ClippingsSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName('Folder for new references')
         .addText((text) => {
-          text.setValue(this.plugin.pluginSettings.newNotesFolder);
+          text.setValue(
+            this.plugin.pluginSettings.newNotesFolder || 'reference'
+          );
           text.onChange((value) => {
             this.plugin.pluginSettings.newNotesFolder = value;
           });
@@ -184,7 +186,9 @@ class ClippingsSettingsTab extends PluginSettingTab {
         .setName('Tags for new references')
         .setDesc('Additional comma-separated tags for new notes')
         .addText((text) => {
-          text.setValue(this.plugin.pluginSettings.newNotesTags.join(','));
+          text.setValue(
+            (this.plugin.pluginSettings.newNotesTags || []).join(',')
+          );
           text.onChange((value) => {
             this.plugin.pluginSettings.newNotesTags = value
               .split(',')
@@ -193,7 +197,7 @@ class ClippingsSettingsTab extends PluginSettingTab {
         });
     }
 
-    // Integrations options
+    // General integrations options
     containerEl.createEl('h2', { text: 'Integrations' });
     containerEl.appendChild(
       createFragment((el) => {
@@ -210,14 +214,21 @@ class ClippingsSettingsTab extends PluginSettingTab {
         );
       })
     );
+
+    // Per-integration options
     for (let integration of this.plugin.integrations) {
-      integration.contributeSettings(containerEl, async () => {
-        const config = integration.getSettings();
-        await this.plugin.saveSettings({
-          integrations: { [integration.getID()]: config.settings },
-          secrets: { [integration.getID()]: config.secrets },
+      console.log(`${integration.getID()}: Registering configuration`);
+      try {
+        integration.contributeSettings(containerEl, async () => {
+          const config = integration.getSettings();
+          await this.plugin.saveSettings({
+            integrations: { [integration.getID()]: config.settings },
+            secrets: { [integration.getID()]: config.secrets },
+          });
         });
-      });
+      } catch (err) {
+        console.log(`${integration.getID()}: ${err}`);
+      }
     }
   }
 }

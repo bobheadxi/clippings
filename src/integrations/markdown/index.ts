@@ -79,6 +79,7 @@ export default class Markdown extends Integration<Settings, {}> {
 
   contributeSettings(settings: HTMLElement, save: () => Promise<void>) {
     settings.createEl('h3', { text: 'Markdown' });
+    console.log('contributeSettings');
     new Setting(settings)
       .setName('Replace imported note contents')
       .addToggle(async (toggle) => {
