@@ -1,9 +1,7 @@
 import { Setting, Plugin, Notice } from 'obsidian';
 
-import Integration, {
-  IntegrationReference,
-} from 'src/integrations/integration';
-import { PluginSettings } from 'src/settings';
+import Integration from 'src/integrations/integration';
+import { PluginSettings } from 'src/plugin/settings';
 
 import { parseArticles } from './parse';
 

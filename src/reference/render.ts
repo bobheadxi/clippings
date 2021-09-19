@@ -1,6 +1,6 @@
 import { Metadata } from 'src/lib/url';
 
-import { defaultReferenceTag } from 'src/settings';
+import { defaultReferenceTag } from 'src/plugin/settings';
 import { Highlight, ReferenceVersion } from 'src/reference';
 import { isoNow } from 'src/lib/time';
 

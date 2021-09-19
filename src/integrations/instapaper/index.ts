@@ -1,7 +1,7 @@
 import { App, Setting, Notice, Plugin } from 'obsidian';
 
 import Integration from 'src/integrations/integration';
-import { PluginSettings } from 'src/settings';
+import { PluginSettings } from 'src/plugin/settings';
 import InstapaperClient from './client';
 
 export interface Secrets {

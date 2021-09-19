@@ -5,7 +5,7 @@ import qp from 'quoted-printable';
 import utf8 from 'utf8';
 
 import Integration from 'src/integrations/integration';
-import { PluginSettings } from 'src/settings';
+import { PluginSettings } from 'src/plugin/settings';
 
 import parseReference from './parse';
 

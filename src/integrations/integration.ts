@@ -1,5 +1,5 @@
 import { Plugin } from 'obsidian';
-import { PluginSettings as PluginSettings } from 'src/settings';
+import { PluginSettings as PluginSettings } from 'src/plugin/settings';
 import { sanitizeFilename } from 'src/lib/file';
 import { getMeta, Metadata } from 'src/lib/url';
 import { Reference, Highlight } from 'src/reference';

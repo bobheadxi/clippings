@@ -1,7 +1,7 @@
 import { App, normalizePath, stringifyYaml } from 'obsidian';
 
 import { Reference } from 'src/reference';
-import { PluginSettings } from 'src/settings';
+import { PluginSettings } from 'src/plugin/settings';
 import {
   buildFrontmatter,
   renderHighlights,
