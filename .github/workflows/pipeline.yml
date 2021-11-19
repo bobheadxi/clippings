@@ -8,17 +8,20 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-
     steps:
+    # Setup
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: 14.x
-
     - run: npm install
-    - run: npm build
-    - run: npm test -- --collect-coverage
 
+    # Checks
+    - run: npm run build
+    - run: npm run prettier
+
+    # Test
+    - run: npm test -- --collect-coverage
     - uses: codecov/codecov-action@v2
       with:
         verbose: true
