@@ -126,8 +126,8 @@ export default class Clippings extends Plugin {
     if (
       meta.tags?.find(
         (tc) =>
-          `#${tc.tag}` === this.pluginSettings.referenceTag ||
-          defaultReferenceTag
+          `#${tc.tag}` ===
+          (this.pluginSettings.referenceTag || defaultReferenceTag)
       )
     ) {
       console.log(`migrating '${file.path}'`);
