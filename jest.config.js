@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   preset: 'ts-jest',
   moduleDirectories: ['node_modules', 'src'],
   moduleNameMapper: {
