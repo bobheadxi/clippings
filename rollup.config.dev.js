@@ -1,7 +1,7 @@
-import rollupConfig from './rollup.config';
+import rollupConfig from './rollup.config.js';
 import path from 'path';
 import fs from 'fs';
-import manifest from './manifest.json';
+import manifest from './manifest.json' assert { type: "json" };
 
 const manifestPath = 'manifest.json';
 
