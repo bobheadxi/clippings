@@ -4,11 +4,6 @@ import { Migration } from './migration';
 
 export class Frontmatter {
   static reference_format = ReferenceVersion.V1;
-
-  url: string;
-  author: string;
-  publisher: string;
-  published: string;
 }
 
 export default class V1 implements Migration {

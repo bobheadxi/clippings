@@ -10,7 +10,7 @@ describe('renderHeader', () => {
   };
   test('just description', () => {
     const h = render.renderHeader({ ...meta, description: 'my description' });
-    expect(h).toEqual(`# [${meta.title}](${meta.url})
+    expect(h).toEqual(`${meta.url}
 
 > my description
 `);
@@ -18,7 +18,7 @@ describe('renderHeader', () => {
 
   test('just author', () => {
     const h = render.renderHeader({ ...meta, author: 'bobheadxi' });
-    expect(h).toEqual(`# [${meta.title}](${meta.url})
+    expect(h).toEqual(`${meta.url}
 
 – bobheadxi
 `);
@@ -30,7 +30,7 @@ describe('renderHeader', () => {
       description: 'my description',
       author: 'bobheadxi',
     });
-    expect(h).toEqual(`# [${meta.title}](${meta.url})
+    expect(h).toEqual(`${meta.url}
 
 > my description
 

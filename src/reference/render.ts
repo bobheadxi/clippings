@@ -5,9 +5,17 @@ import { Highlight, ReferenceVersion } from 'src/reference';
 import { isoNow } from 'src/lib/time';
 
 // Correspond to current version of frontmatter
-import { Frontmatter } from './migrations/v1';
+import { Frontmatter } from './migrations/v1_1';
 
-type BaseFrontmatter = { created: string; reference_format: ReferenceVersion };
+type BaseFrontmatter = {
+  created: string;
+  reference_format: ReferenceVersion;
+
+  url: string;
+  author: string;
+  publisher: string;
+  published: string;
+};
 
 export function buildFrontmatter(
   meta: Metadata
@@ -49,7 +57,7 @@ export function renderHeader(meta: Metadata) {
   ]
     .filter((v) => v && v.length > 2)
     .join(', ');
-  return `# ${meta.url ? `[${meta.title}](${meta.url})` : `${meta.title}`}
+  return `${meta.url || ``}
 ${
   meta.description
     ? `
