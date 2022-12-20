@@ -124,10 +124,10 @@ export default class Clippings extends Plugin {
   async maybeMigrateNote(file: TFile) {
     const meta = this.app.metadataCache.getFileCache(file);
     if (
-      meta.tags?.find(
-        (tc) =>
-          `#${tc.tag}` ===
-          (this.pluginSettings.referenceTag || defaultReferenceTag)
+      meta.tags?.find((tc) =>
+        tc.tag.startsWith(
+          this.pluginSettings.referenceTag || defaultReferenceTag
+        )
       )
     ) {
       console.log(`migrating '${file.path}'`);
@@ -137,10 +137,12 @@ export default class Clippings extends Plugin {
       await this.app.vault.modify(
         file,
         `---
-  ${stringifyYaml(migrated.frontmatter)}---
-  
-  ${migrated.body}`
+${stringifyYaml(migrated.frontmatter)}---
+
+${migrated.body}`
       );
+    } else {
+      console.log(`skipping '${file.path}'`, { tags: meta.tags });
     }
   }
 }
