@@ -11,16 +11,16 @@ import {
 
 export async function generateNote(
   app: App,
+  basePath: string,
   reference: Reference,
-  settings: PluginSettings
+  tags: {
+    referenceTag?: string;
+    newNotesTags?: string[];
+  }
 ) {
   const { meta, highlights } = reference;
   const renderedHighlights = renderHighlights(highlights);
-  const filename = normalizePath(
-    `${settings.newNotesFolder || app.fileManager.getNewFileParent('').path}/${
-      reference.filename
-    }`
-  );
+  const filename = normalizePath(`${basePath}/${reference.filename}`);
 
   // Generate or append to a file
   let referenceFile;
@@ -47,13 +47,13 @@ ${stringifyYaml(buildFrontmatter(meta))}---
 ${renderHeader(meta)}
 ${reference.comment || 'TODO'}
 
-${renderTags(settings.referenceTag, settings.newNotesTags)}
+${renderTags(tags.referenceTag, tags.newNotesTags)}
 
 ## Highlights
 
 ${renderedHighlights}`;
 
-    referenceFile = await app.vault.create(noteContent, filename);
+    referenceFile = await app.vault.create(filename, noteContent);
   }
   return referenceFile;
 }

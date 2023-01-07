@@ -112,13 +112,21 @@ export default abstract class Integration<
     }
 
     // generate or update files
+    const basePath =
+      this.pluginSettings.newNotesFolder ||
+      app.fileManager.getNewFileParent('').path;
+    console.log(`generating notes in "${basePath}"`);
     const generatedNotes = [];
     for (let reference of references) {
       try {
         const referenceFile = await generateNote(
           this.plugin.app,
+          basePath,
           reference,
-          this.settings
+          {
+            referenceTag: this.pluginSettings.referenceTag,
+            newNotesTags: this.pluginSettings.newNotesTags,
+          }
         );
         generatedNotes.push(referenceFile);
       } catch (err) {
