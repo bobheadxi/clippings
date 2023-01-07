@@ -14,8 +14,13 @@ export async function generateNote(
   reference: Reference,
   settings: PluginSettings
 ) {
-  const { filename, meta, highlights } = reference;
+  const { meta, highlights } = reference;
   const renderedHighlights = renderHighlights(highlights);
+  const filename = normalizePath(
+    `${settings.newNotesFolder || app.fileManager.getNewFileParent('').path}/${
+      reference.filename
+    }`
+  );
 
   // Generate or append to a file
   let referenceFile;
@@ -28,7 +33,6 @@ export async function generateNote(
     });
 
     const contents = await app.vault.read(referenceFile);
-    console.log(contents);
     await app.vault.modify(
       referenceFile,
       `${contents}\n\n${renderedHighlights}`
@@ -49,14 +53,7 @@ ${renderTags(settings.referenceTag, settings.newNotesTags)}
 
 ${renderedHighlights}`;
 
-    referenceFile = await app.vault.create(
-      normalizePath(
-        `${
-          settings.newNotesFolder || app.fileManager.getNewFileParent('').path
-        }/${filename}`
-      ),
-      noteContent
-    );
+    referenceFile = await app.vault.create(noteContent, filename);
   }
   return referenceFile;
 }
